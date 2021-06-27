@@ -8,9 +8,33 @@
 
 import SwiftUI
 
+struct EmitterView: View {
+    private struct ParticleView: View {
+        var body: some View {
+            Image("spark")
+        }
+    }
+    
+    var particleCount: Int
+    
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                ForEach(0..<self.particleCount, id: \.self) { i in
+                    ParticleView()
+                }
+            }
+        }
+    }
+}
+
 struct ContentView: View {
     var body: some View {
-        Text("Hello, World!")
+        ZStack {
+            EmitterView(particleCount: 200)
+        }
+        .background(Color.black)
+        .edgesIgnoringSafeArea(.all)
     }
 }
 
