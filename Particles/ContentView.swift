@@ -12,13 +12,14 @@ struct EmitterView: View {
     private struct ParticleView: View {
         @State private var isActive = false
         
+        let image: Image
         let position: ParticleState<CGPoint>
         let opacity: ParticleState<Double>
         let rotation: ParticleState<Angle>
         let scale: ParticleState<CGFloat>
         
         var body: some View {
-            Image("spark")
+            image
                 .opacity(isActive ? opacity.end : opacity.start)
                 .scaleEffect(isActive ? scale.end : scale.start)
                 .rotationEffect(isActive ? rotation.end : rotation.start)
@@ -37,6 +38,7 @@ struct EmitterView: View {
         }
     }
     
+    var images: [String]
     var particleCount: Int
     
     var creationPoint = UnitPoint.center
@@ -63,17 +65,21 @@ struct EmitterView: View {
     var speed = 50.0
     var speedRange = 0.0
     
+    var animation = Animation.linear(duration: 1).repeatForever(autoreverses: false)
+    var animationDelayThreshold = 0.0
+    
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 ForEach(0..<self.particleCount, id: \.self) { i in
                     ParticleView(
+                        image: Image(self.images.randomElement()!),
                         position: self.position(in: geo),
                         opacity: self.makeOpacity(),
                         rotation: self.makeRotation(),
                         scale: self.makeScale()
                     )
-                    .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
+                    .animation(self.animation.delay(Double.random(in: 0...self.animationDelayThreshold)))
                     .colorMultiply(self.colors.randomElement() ?? .white)
                     .blendMode(self.blendMode)
                 }
@@ -133,7 +139,7 @@ struct EmitterView: View {
 struct ContentView: View {
     var body: some View {
         ZStack {
-            EmitterView(particleCount: 200, colors: [.red], blendMode: .screen, angleRange: .degrees(360), opacitySpeed: -1, scale: 0.4, scaleRange: 0.1, scaleSpeed: 0.4, speedRange: 80)
+            EmitterView(images: ["spark"], particleCount: 200, colors: [.red], blendMode: .screen, angleRange: .degrees(360), opacitySpeed: -1, scale: 0.4, scaleRange: 0.1, scaleSpeed: 0.4, speedRange: 80, animation: Animation.easeOut(duration: 1).repeatForever(autoreverses: false))
         }
         .background(Color.black)
         .edgesIgnoringSafeArea(.all)
