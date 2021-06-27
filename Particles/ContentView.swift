@@ -16,6 +16,7 @@ struct EmitterView: View {
         var body: some View {
             Image("spark")
                 .position(isActive ? position.end : position.start)
+                .onAppear { self.isActive = true }
         }
     }
     
@@ -47,6 +48,7 @@ struct EmitterView: View {
                     ParticleView(
                         position: self.position(in: geo)
                     )
+                    .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
                 }
             }
         }
@@ -82,7 +84,7 @@ struct EmitterView: View {
 struct ContentView: View {
     var body: some View {
         ZStack {
-            EmitterView(particleCount: 200)
+            EmitterView(particleCount: 200, angleRange: .degrees(360), speedRange: 80)
         }
         .background(Color.black)
         .edgesIgnoringSafeArea(.all)
