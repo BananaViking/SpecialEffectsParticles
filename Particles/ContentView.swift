@@ -42,6 +42,9 @@ struct EmitterView: View {
     var creationPoint = UnitPoint.center
     var creationRange = CGSize.zero
     
+    var colors = [Color.white]
+    var blendMode = BlendMode.normal
+    
     var angle = Angle.zero
     var angleRange = Angle.zero
     
@@ -71,6 +74,8 @@ struct EmitterView: View {
                         scale: self.makeScale()
                     )
                     .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
+                    .colorMultiply(self.colors.randomElement() ?? .white)
+                    .blendMode(self.blendMode)
                 }
             }
         }
@@ -128,7 +133,7 @@ struct EmitterView: View {
 struct ContentView: View {
     var body: some View {
         ZStack {
-            EmitterView(particleCount: 200, angleRange: .degrees(360), opacitySpeed: -1, scale: 0.4, scaleRange: 0.1, scaleSpeed: 0.4, speedRange: 80)
+            EmitterView(particleCount: 200, colors: [.red], blendMode: .screen, angleRange: .degrees(360), opacitySpeed: -1, scale: 0.4, scaleRange: 0.1, scaleSpeed: 0.4, speedRange: 80)
         }
         .background(Color.black)
         .edgesIgnoringSafeArea(.all)
