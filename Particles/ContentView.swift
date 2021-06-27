@@ -11,10 +11,15 @@ import SwiftUI
 struct EmitterView: View {
     private struct ParticleView: View {
         @State private var isActive = false
+        
         let position: ParticleState<CGPoint>
+        let opacity: ParticleState<Double>
+        let scale: ParticleState<CGFloat>
         
         var body: some View {
             Image("spark")
+                .opacity(isActive ? opacity.end : opacity.start)
+                .scaleEffect(isActive ? scale.end : scale.start)
                 .position(isActive ? position.end : position.start)
                 .onAppear { self.isActive = true }
         }
@@ -38,6 +43,14 @@ struct EmitterView: View {
     var angle = Angle.zero
     var angleRange = Angle.zero
     
+    var opacity = 1.0
+    var opacityRange = 0.0
+    var opacitySpeed = 0.0
+    
+    var scale: CGFloat = 1
+    var scaleRange: CGFloat = 0
+    var scaleSpeed: CGFloat = 0
+    
     var speed = 50.0
     var speedRange = 0.0
     
@@ -46,7 +59,9 @@ struct EmitterView: View {
             ZStack {
                 ForEach(0..<self.particleCount, id: \.self) { i in
                     ParticleView(
-                        position: self.position(in: geo)
+                        position: self.position(in: geo),
+                        opacity: self.makeOpacity(),
+                        scale: self.makeScale()
                     )
                     .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
                 }
@@ -79,12 +94,26 @@ struct EmitterView: View {
         
         return ParticleState(start, end)
     }
+    
+    private func makeOpacity() -> ParticleState<Double> {
+        let halfOpacityRange = opacityRange / 2
+        let randomOpacity = Double.random(in: -halfOpacityRange...halfOpacityRange)
+        
+        return ParticleState(opacity + randomOpacity, opacity + opacitySpeed + randomOpacity)
+    }
+    
+    private func makeScale() -> ParticleState<CGFloat> {
+        let halfScaleRange = scaleRange / 2
+        let randomScale = CGFloat.random(in: -halfScaleRange...halfScaleRange)
+        
+        return ParticleState(scale + randomScale, scale + scaleSpeed + randomScale)
+    }
 }
 
 struct ContentView: View {
     var body: some View {
         ZStack {
-            EmitterView(particleCount: 200, angleRange: .degrees(360), speedRange: 80)
+            EmitterView(particleCount: 200, angleRange: .degrees(360), opacitySpeed: -1, scale: 0.4, scaleRange: 0.1, scaleSpeed: 0.4, speedRange: 80)
         }
         .background(Color.black)
         .edgesIgnoringSafeArea(.all)
